@@ -93,7 +93,7 @@ export default function ChannelPerformance({ data }) {
                 >
                     <ResponsiveContainer width="100%" height={320}>
                         <PieChart>
-                            <Pie data={pieData} dataKey="sales" nameKey="name" cx="50%" cy="50%" outerRadius={120} label={showPieLabels ? (e) => `${e.name}: ${formatCompact(e.sales)}` : (e) => e.name}>
+                            <Pie data={pieData} dataKey="sales" nameKey="name" cx="50%" cy="50%" outerRadius={120} label={showPieLabels ? (e) => `${e.name}: ${(e.percent * 100).toFixed(1)}%` : (e) => `${e.name} ${(e.percent * 100).toFixed(1)}%`}>
                                 {pieData.map((entry, i) => (
                                     <Cell key={i} fill={entry.fill} />
                                 ))}

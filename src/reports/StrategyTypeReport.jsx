@@ -58,7 +58,7 @@ export default function StrategyTypeReport({ data }) {
                 >
                     <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
-                            <Pie data={typeWithColor} dataKey="views" nameKey="name" cx="50%" cy="50%" outerRadius={110} label={showPieLabels ? (e) => `${e.name}: ${formatCompact(e.views)}` : (e) => e.name}>
+                            <Pie data={typeWithColor} dataKey="views" nameKey="name" cx="50%" cy="50%" outerRadius={110} label={showPieLabels ? (e) => `${e.name}: ${(e.percent * 100).toFixed(1)}%` : (e) => `${e.name} ${(e.percent * 100).toFixed(1)}%`}>
                                 {typeWithColor.map((entry, i) => (
                                     <Cell key={i} fill={entry.fill} />
                                 ))}
