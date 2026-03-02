@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import KPICard from '../components/KPICard';
 import ChartCard from '../components/ChartCard';
 import DataTable from '../components/DataTable';
@@ -7,8 +7,22 @@ import { formatNumber, formatCurrency, formatPercent, formatCompact } from '../u
 
 export default function UnderperformerReport({ data }) {
     const [viewThreshold, setViewThreshold] = useState(1000);
+    const [strategyFilter, setStrategyFilter] = useState('all');
 
     const { result: underperformers, loading } = useWorkerData(data, 'getUnderperformers', viewThreshold);
+
+    // Extract unique strategies for the filter dropdown
+    const strategies = useMemo(() => {
+        if (!underperformers) return [];
+        return [...new Set(underperformers.map(u => u.strategy).filter(Boolean))].sort();
+    }, [underperformers]);
+
+    // Apply strategy filter
+    const filtered = useMemo(() => {
+        if (!underperformers) return [];
+        if (strategyFilter === 'all') return underperformers;
+        return underperformers.filter(u => u.strategy === strategyFilter);
+    }, [underperformers, strategyFilter]);
 
     if (loading || !underperformers) {
         return (
@@ -19,10 +33,10 @@ export default function UnderperformerReport({ data }) {
         );
     }
 
-    const zeroClickCount = underperformers.filter(u => u.issues.includes('Zero Clicks')).length;
-    const zeroSalesCount = underperformers.filter(u => u.issues.includes('Zero Sales')).length;
-    const lowCTRCount = underperformers.filter(u => u.issues.includes('Very Low CTR')).length;
-    const totalWastedViews = underperformers
+    const zeroClickCount = filtered.filter(u => u.issues.includes('Zero Clicks')).length;
+    const zeroSalesCount = filtered.filter(u => u.issues.includes('Zero Sales')).length;
+    const lowCTRCount = filtered.filter(u => u.issues.includes('Very Low CTR')).length;
+    const totalWastedViews = filtered
         .filter(u => u.issues.includes('Zero Clicks'))
         .reduce((sum, u) => sum + u.views, 0);
 
@@ -50,7 +64,7 @@ export default function UnderperformerReport({ data }) {
 
     return (
         <div className="report-page">
-            <h2 className="report-title">Underperformer Report</h2>
+            <h2 className="report-title">Under Performance Report</h2>
             <p className="report-subtitle">Items with high visibility but low engagement or conversion</p>
 
             <div className="controls-bar">
@@ -63,6 +77,15 @@ export default function UnderperformerReport({ data }) {
                         <option value={5000}>5,000+</option>
                         <option value={10000}>10,000+</option>
                         <option value={50000}>50,000+</option>
+                    </select>
+                </div>
+                <div className="control-group">
+                    <label className="control-label">Strategy</label>
+                    <select className="control-select" value={strategyFilter} onChange={(e) => setStrategyFilter(e.target.value)}>
+                        <option value="all">All Strategies ({strategies.length})</option>
+                        {strategies.map(s => (
+                            <option key={s} value={s}>{s}</option>
+                        ))}
                     </select>
                 </div>
             </div>
@@ -98,8 +121,8 @@ export default function UnderperformerReport({ data }) {
                 />
             </div>
 
-            <ChartCard title={`Underperforming Items (${underperformers.length} found)`} subtitle={`Threshold: ${formatNumber(viewThreshold)}+ views`}>
-                <DataTable columns={columns} data={underperformers} defaultSortKey="views" maxRows={100} />
+            <ChartCard title={`Underperforming Items (${filtered.length} found)`} subtitle={`Threshold: ${formatNumber(viewThreshold)}+ views${strategyFilter !== 'all' ? ` · Strategy: ${strategyFilter}` : ''}`}>
+                <DataTable columns={columns} data={filtered} defaultSortKey="views" maxRows={100} />
             </ChartCard>
         </div>
     );

@@ -44,9 +44,12 @@ function getKPISummary(data) {
 
     // Derived efficiency metrics
     const rpc = agg.clicks > 0 ? agg.sales / agg.clicks : 0;
-    const conversionRate = agg.clicks > 0 ? (agg.orders / agg.clicks) * 100 : 0;
     const aov = agg.orders > 0 ? agg.sales / agg.orders : 0;
     const itemsPerOrder = agg.orders > 0 ? agg.items / agg.orders : 0;
+    const salesPer1kViews = agg.views > 0 ? (agg.sales / agg.views) * 1000 : 0;
+    const ordersPer1kViews = agg.views > 0 ? (agg.orders / agg.views) * 1000 : 0;
+    const ordersPer1kClicks = agg.clicks > 0 ? (agg.orders / agg.clicks) * 1000 : 0;
+    const recASP = agg.items > 0 ? agg.sales / agg.items : 0;
 
     // Month-over-Month deltas
     let mom = {};
@@ -100,9 +103,12 @@ function getKPISummary(data) {
     return {
         ...agg,
         rpc,
-        conversionRate,
         aov,
         itemsPerOrder,
+        salesPer1kViews,
+        ordersPer1kViews,
+        ordersPer1kClicks,
+        recASP,
         mom,
         topChannel,
         topChannelPct,
@@ -198,14 +204,17 @@ function getMonthlyTrend(data) {
 }
 
 function getCrossDimensional(data, dim1, dim2, metric = 'ctr') {
-    const dim1Values = [...new Set(data.map(r => r[dim1]).filter(Boolean))].sort();
-    const dim2Values = [...new Set(data.map(r => r[dim2]).filter(Boolean))].sort();
+    const resolveDim = (row, dim) =>
+        dim === 'placement' ? `${row.page_type || ''} › ${row.page_area || ''}` : row[dim];
+
+    const dim1Values = [...new Set(data.map(r => resolveDim(r, dim1)).filter(Boolean))].sort();
+    const dim2Values = [...new Set(data.map(r => resolveDim(r, dim2)).filter(Boolean))].sort();
 
     const matrix = [];
     for (const d1 of dim1Values) {
         const row = { name: d1 };
         for (const d2 of dim2Values) {
-            const filtered = data.filter(r => r[dim1] === d1 && r[dim2] === d2);
+            const filtered = data.filter(r => resolveDim(r, dim1) === d1 && resolveDim(r, dim2) === d2);
             if (filtered.length === 0) {
                 row[d2] = null;
             } else {

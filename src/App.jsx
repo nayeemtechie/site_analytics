@@ -45,7 +45,7 @@ export default function App() {
                 <footer className="app-footer">
                     <span>Site Analytics Dashboard</span>
                     <span className="app-footer__sep">·</span>
-                    <span>v1.0.0</span>
+                    <span>Developed by Nayeemuddin Mohammed — CSA Team</span>
                 </footer>
             </div>
         );
@@ -83,6 +83,11 @@ export default function App() {
                     </Suspense>
                 )}
             </main>
+            <footer className="app-footer">
+                <span>Site Analytics Dashboard</span>
+                <span className="app-footer__sep">·</span>
+                <span>Developed by Nayeemuddin Mohammed — CSA Team</span>
+            </footer>
         </div>
     );
 }

@@ -1,16 +1,15 @@
 import { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LabelList } from 'recharts';
 import ChartCard from '../components/ChartCard';
-import DataTable from '../components/DataTable';
 import { useWorkerData } from '../utils/useWorkerData';
 import { formatNumber, formatCurrency, formatPercent, formatCompact } from '../utils/formatters';
 
 const METRICS = [
-    { key: 'views', label: 'Views', color: '#6366f1', format: formatNumber },
-    { key: 'clicks', label: 'Clicks', color: '#06b6d4', format: formatNumber },
+    { key: 'views', label: 'Rec Views', color: '#6366f1', format: formatNumber },
+    { key: 'clicks', label: 'Rec Clicks', color: '#06b6d4', format: formatNumber },
     { key: 'sales', label: 'Attributable Sales', color: '#10b981', format: formatCurrency },
     { key: 'ctr', label: 'CTR (%)', color: '#f59e0b', format: formatPercent },
-    { key: 'orders', label: 'Attributable Orders', color: '#ef4444', format: formatNumber },
+    { key: 'orders', label: 'Rec Orders', color: '#ef4444', format: formatNumber },
 ];
 
 export default function TrendAnalysis({ data }) {
@@ -90,7 +89,14 @@ export default function TrendAnalysis({ data }) {
                     <ResponsiveContainer width="100%" height={400}>
                         <LineChart data={trend}>
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
-                            <XAxis dataKey="date" stroke="#94a3b8" fontSize={11} tickFormatter={(d) => d.length > 7 ? d.slice(5) : d} />
+                            <XAxis dataKey="date" stroke="#94a3b8" fontSize={11} tickFormatter={(d) => {
+                                const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                                if (granularity === 'monthly' && d.length === 7) {
+                                    const [year, month] = d.split('-');
+                                    return `${MONTHS[parseInt(month, 10) - 1]}-${year.slice(2)}`;
+                                }
+                                return d.length > 7 ? d.slice(5) : d;
+                            }} />
                             {activeMetrics.map((key, idx) => {
                                 const metric = METRICS.find(m => m.key === key);
                                 return (
@@ -113,7 +119,7 @@ export default function TrendAnalysis({ data }) {
                                     return [metric ? metric.format(v) : v, metric?.label || name];
                                 }}
                             />
-                            <Legend />
+                            <Legend wrapperStyle={{ fontSize: '0.85rem', fontWeight: 500 }} />
                             {activeMetrics.map(key => {
                                 const metric = METRICS.find(m => m.key === key);
                                 return (
@@ -122,7 +128,7 @@ export default function TrendAnalysis({ data }) {
                                         yAxisId={key}
                                         type="monotone"
                                         dataKey={key}
-                                        name={key}
+                                        name={metric.label}
                                         stroke={metric.color}
                                         strokeWidth={2}
                                         dot={false}
@@ -134,14 +140,6 @@ export default function TrendAnalysis({ data }) {
                             })}
                         </LineChart>
                     </ResponsiveContainer>
-                )}
-            </ChartCard>
-
-            <ChartCard title="Data Table">
-                {loading || !trend ? (
-                    <div className="report-loading"><div className="spinner" /></div>
-                ) : (
-                    <DataTable columns={columns} data={trend} defaultSortKey="date" defaultSortDir="desc" maxRows={50} />
                 )}
             </ChartCard>
         </div>

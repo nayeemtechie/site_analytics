@@ -7,7 +7,7 @@ const TABS = [
     { id: 'strategy-type', label: 'Strategy Types', icon: '⚙️' },
     { id: 'trend', label: 'Trend Analysis', icon: '📉' },
     { id: 'cross', label: 'Cross-Dimensional', icon: '🗺️' },
-    { id: 'underperformer', label: 'Underperformers', icon: '🚨' },
+    { id: 'underperformer', label: 'Under Performance Report', icon: '🚨' },
 ];
 
 export { TABS };

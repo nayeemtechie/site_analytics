@@ -258,7 +258,10 @@ export default function ExecutiveDashboard({ data }) {
                 <KPICard icon="💰" label="Attributable Sales" value={formatCompact(kpi.sales)} subtitle={formatCurrency(kpi.sales)} trend={kpi.mom?.sales} />
                 <KPICard icon="📦" label="Attributable Orders" value={formatCompact(kpi.orders)} subtitle={formatNumber(kpi.orders)} trend={kpi.mom?.orders} />
                 <KPICard icon="💵" label="Revenue / Click" value={formatCurrency(kpi.rpc)} subtitle="Per click revenue" trend={kpi.mom?.rpc} />
-                <KPICard icon="🎯" label="Conversion Rate" value={formatPercent(kpi.conversionRate)} subtitle={`${formatNumber(kpi.orders)} orders / ${formatNumber(kpi.clicks)} clicks`} />
+                <KPICard icon="📈" label="Rec Sales / 1K Views" value={formatCurrency(kpi.salesPer1kViews)} subtitle="Sales per 1,000 views" />
+                <KPICard icon="🎯" label="Rec Orders / 1K Views" value={kpi.ordersPer1kViews.toFixed(2)} subtitle="Orders per 1,000 views" />
+                <KPICard icon="🔄" label="Rec Orders / 1K Clicks" value={kpi.ordersPer1kClicks.toFixed(2)} subtitle="Orders per 1,000 clicks" />
+                <KPICard icon="🏷️" label="Rec ASP" value={formatCurrency(kpi.recASP)} subtitle="Avg sale price per item" />
                 <KPICard icon="🛒" label="Avg Order Value" value={formatCurrency(kpi.aov)} subtitle="Per order revenue" />
                 <KPICard icon="📦" label="Items / Order" value={kpi.itemsPerOrder.toFixed(1)} subtitle={`${formatNumber(kpi.items)} items total`} />
                 <KPICard icon="🧪" label="Active Strategies" value={kpi.uniqueStrategies} subtitle={`${kpi.uniquePages} page types · ${kpi.uniqueChannels} channels`} />
